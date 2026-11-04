@@ -1,0 +1,13 @@
+Gantikan gambar contoh dengan gambar anda. Nama fail MESTI sama dan huruf kecil.
+Replace the example pictures with your own. File names must stay the same, in lowercase.
+Boleh guna / You can use: jpg, jpeg, png, webp  (logo juga boleh svg / logo can also be svg)
+
+images/logo.png        -> logo kedai di atas / shop logo in the header (tinggi sekitar 100 piksel, latar telus / about 100 px tall, transparent)
+images/background.jpg  -> latar belakang laman / page background
+images/main menu/      -> 1.jpg, 2.jpg, 3.jpg, 4.jpg ... (sehingga/up to 10)  carousel, 1600 x 600
+images/jahitan/        -> baju-kurung.jpg, alterasi.jpg          800 x 600
+images/makanan/        -> waffle.jpg, pulut.jpg, kerabu.jpg, minuman.jpg   800 x 600
+
+Carousel: tambah gambar 5, 6 ... dan ia muncul sendiri / add 5, 6 ... and they appear automatically.
+Kecilkan saiz gambar (bawah 300 KB setiap satu) / keep each picture under 300 KB.
+Buka laman dengan Live Server atau hosting / open the site with Live Server or hosting.

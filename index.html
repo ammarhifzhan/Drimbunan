@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DRimbunan – Jahitan dan Makanan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root { --ink:#26491f; --paper:#f5f8f2; --tape:#c7ddbd; --chili:#4b7f3b; --text:#26491f; --muted:#26491f; --surface:#fff; --line:#d6e3d2; --line-soft:#e5eee2; --photo:#e6efe2; }
+  * { box-sizing: border-box; margin: 0; }
+  body { font-family:"Source Sans 3",system-ui,sans-serif; color:var(--text); background:var(--paper); line-height:1.6; min-height:100vh; display:flex; flex-direction:column; }
+  h1,h2,h3 { font-family:inherit; line-height:1.1; }
+  a { color:inherit; }
+  :focus-visible { outline:3px solid var(--tape); outline-offset:3px; }
+  [hidden] { display:none !important; }
+  .wrap { max-width:1200px; margin:0 auto; padding:0 20px; width:100%; }
+
+  header { background:#ffffff; color:#26491f; }
+  header .wrap { display:flex; justify-content:space-between; align-items:center; padding-top:16px; padding-bottom:16px; gap:10px; flex-wrap:wrap; }
+  .logo { font-family:inherit; font-weight:700; font-size:1.3rem; text-decoration:none; }
+  nav a { margin-left:18px; text-decoration:none; }
+  nav a:hover { text-decoration:underline; }
+
+  main { flex:1; padding:40px 0; }
+
+  /* Home: two big boxes */
+  .home h1 { font-size:clamp(1.8rem,5vw,2.8rem); margin-bottom:6px; }
+  .home p.lead { color:var(--muted); margin-bottom:24px; }
+  .boxes { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+  .box { border:1px solid var(--line); cursor:pointer; text-align:left; font:inherit; border-radius:8px; padding:24px; min-height:220px;
+         display:flex; flex-direction:column; justify-content:flex-end; transition:transform .2s ease, box-shadow .2s ease, border-color .2s ease; }
+  .box:hover { transform:translateY(-6px); box-shadow:0 10px 24px rgba(38,73,31,.16); border-color:var(--chili); }
+  .box h2 { font-size:clamp(2rem,6vw,3rem); }
+  .box span { margin-top:6px; font-size:1.05rem; }
+  .box.tailor, .box.food { background:var(--surface); color:var(--ink); }
+  .box.tailor:hover, .box.food:hover { background:var(--ink); color:#fff; }
+
+  /* Product views */
+  .back { background:none; border:0; font:inherit; font-weight:600; cursor:pointer; color:var(--ink); padding:4px 0; margin-bottom:18px; transition:transform .2s ease, box-shadow .2s ease, background .2s ease, color .2s ease; }
+  .back:hover { background:var(--ink); color:#fff; text-decoration:none; transform:translateY(-3px); box-shadow:0 6px 16px rgba(38,73,31,.16); }
+  .view h2 { font-size:clamp(1.8rem,5vw,2.6rem); padding-left:14px; border-left:8px solid var(--tape); }
+  #food-view h2 { border-left-color:var(--chili); }
+  .view .lead { color:var(--muted); margin:8px 0 28px; max-width:54ch; }
+  .items { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:20px; }
+  .item { background:var(--surface); border:1px solid var(--line); border-radius:6px; overflow:hidden; }
+  #food-view .items { grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); }
+  .cat { display:block; width:100%; text-align:left; font:inherit; color:inherit; cursor:pointer; padding:0; transition:transform .2s ease, box-shadow .2s ease, background .2s ease, color .2s ease, border-color .2s ease; }
+  .cat.active { border:2px solid var(--chili); }
+  #menu-panel { margin-top:24px; }
+  .menu-block h3 { font-size:1.5rem; }
+  .cat:hover { transform:translateY(-5px); background:var(--ink); color:#fff; border-color:var(--chili); box-shadow:0 10px 24px rgba(38,73,31,.16); }
+  .cat:hover .photo { background:var(--chili); color:#fff; }
+  .cat:hover p { color:#fff; }
+  .menu { list-style:none; padding:0; margin-top:20px; width:100%; background:var(--surface); border:1px solid var(--line); border-radius:8px; }
+  .menu li { display:flex; justify-content:space-between; gap:16px; padding:14px 18px; border-bottom:1px solid var(--line-soft); }
+  .menu li:last-child { border-bottom:0; }
+  .menu span:first-child { font-weight:600; }
+  .photo { aspect-ratio:4/3; display:grid; place-items:center; background:var(--photo); color:var(--muted); font-size:.9rem; }
+  .item .body { padding:14px 16px 18px; }
+  .item h3 { font-size:1.2rem; }
+  .item p { color:var(--muted); font-size:.95rem; margin:4px 0 10px; }
+  .price { font-weight:600; }
+
+  .contact { background:var(--surface); color:var(--ink); padding:36px 0; }
+  .contact a { color:var(--ink); }
+  .contact h2 { font-size:1.6rem; }
+  .contact dl { display:grid; grid-template-columns:max-content 1fr; gap:8px 20px; margin-top:16px; }
+  .contact dt { font-weight:600; }
+  footer { background:#ffffff; color:#26491f; text-align:center; padding:16px; font-size:.9rem; border-top:1px solid #dce8d8; }
+
+
+  .contact-grid { display:grid; grid-template-columns:1fr 1fr; gap:32px; }
+  .details { display:grid; grid-template-columns:max-content 1fr; gap:10px 20px; align-content:start; }
+  .details dt { font-weight:600; color:var(--ink); }
+  .details a { color:var(--chili); }
+  #msg-form { display:flex; flex-direction:column; gap:6px; background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:20px; }
+  #msg-form label { font-weight:600; font-size:.95rem; margin-top:6px; }
+  #msg-form input, #msg-form select, #msg-form textarea { font:inherit; padding:10px; border:1px solid var(--line); border-radius:6px; background:var(--paper); }
+  .send { margin-top:14px; border:0; border-radius:6px; padding:12px; font:inherit; font-weight:600; cursor:pointer; background:var(--tape); color:var(--ink); }
+  .send:hover { background:var(--ink); }
+  .map { margin-top:32px; border-radius:8px; overflow:hidden; border:1px solid var(--line); }
+  .map iframe { display:block; width:100%; height:320px; border:0; }
+  @media (max-width:700px) { .contact-grid { grid-template-columns:1fr; } }
+  @media (max-width:600px) { .boxes { grid-template-columns:1fr; } .box { min-height:160px; } }
+  @media (prefers-reduced-motion:reduce) { .box { transition:none; } }
+  /* Phones: cards in one column, top to bottom */
+  @media (max-width:700px) {
+    .boxes { grid-template-columns:1fr; }
+  }
+  /* Card columns: Food 4 / 2 / 1, Tailoring 2 / 1, depending on browser width */
+  .items { grid-template-columns:1fr 1fr; }
+  #food-view .items { grid-template-columns:repeat(4,1fr); }
+  .items > .menu-block { grid-column:1 / -1; }
+  @media (max-width:900px) { #food-view .items { grid-template-columns:1fr 1fr; } }
+  @media (max-width:600px) { .items, #food-view .items { grid-template-columns:1fr; } }
+  .map-link { margin-top:12px; font-weight:600; }
+  .map-link a { color:var(--chili); }
+  .about { margin-top:40px; }
+  .about h2 { font-size:1.2rem; margin-bottom:10px; }
+  .about { background:var(--surface); border:1px solid var(--line); border-radius:6px; padding:18px 20px; }
+  .about p { color:var(--muted); font-size:.95rem; max-width:none; white-space:pre-line; }
+  /* Picture carousel */
+  .carousel { margin-top:40px; }
+  .viewport { position:relative; overflow:hidden; border-radius:8px; }
+  .track { display:flex; transition:transform .5s ease; }
+  .slide { flex:0 0 100%; margin:0; aspect-ratio:16 / 6; }
+  .slide img, .slide .ph { width:100%; height:100%; display:block; }
+  .slide img { object-fit:contain; background:#000; }
+  .slide .ph { display:grid; place-items:center; color:var(--ink); font-weight:600; font-size:1.1rem; }
+  .ph1 { background:linear-gradient(135deg, var(--tape), var(--photo)); }
+  .ph2 { background:linear-gradient(135deg, var(--photo), #b4d2a8); }
+  .ph3 { background:linear-gradient(135deg, #b9d5ae, var(--tape)); }
+  .ph4 { background:linear-gradient(135deg, #d2e5ca, var(--photo)); }
+  .c-btn { position:absolute; top:50%; transform:translateY(-50%); width:44px; height:44px; border:0; border-radius:50%; font-size:1.8rem; line-height:1; cursor:pointer; background:rgba(255,255,255,.85); color:var(--ink); }
+  .c-btn:hover { background:#fff; }
+  .c-prev { left:12px; }
+  .c-next { right:12px; }
+  .dots { display:flex; justify-content:center; gap:8px; margin-top:12px; }
+  .dots button { width:12px; height:12px; padding:0; border:0; border-radius:50%; background:var(--tape); cursor:pointer; }
+  .dots button[aria-selected="true"] { background:var(--chili); }
+  @media (max-width:600px) { .slide { aspect-ratio:4 / 3; } }
+  @media (prefers-reduced-motion:reduce) { .track { transition:none; } }
+  /* Header stays at the top while scrolling */
+  header { position:sticky; top:0; z-index:40; box-shadow:0 2px 12px rgba(38,73,31,.25); }
+  .photo img { width:100%; height:100%; object-fit:contain; background:#000; display:block; }
+  /* Page background picture, softened so text stays easy to read */
+  body { background:linear-gradient(rgba(245,248,242,.68), rgba(245,248,242,.68)), url("images/background.jpg") center / cover fixed no-repeat; }
+  .home h1, .home p.lead, .view > h2, .view > .lead, .back { text-shadow:0 0 10px rgba(245,248,242,.95), 0 0 3px rgba(245,248,242,.95); }
+  .about { scroll-margin-top:90px; }
+  /* Kembali stays visible under the header while scrolling */
+  .back { position:sticky; top:calc(var(--hdr, 64px) + 8px); z-index:30; display:block; width:fit-content;
+           padding:6px 14px; border-radius:999px; background:rgba(245,248,242,.95); box-shadow:0 2px 8px rgba(38,73,31,.2); }
+  .logo { display:flex; align-items:center; }
+  .logo-img { height:44px; width:auto; display:block; }
+  nav { display:flex; flex-wrap:wrap; align-items:center; row-gap:6px; }
+  .lang { display:inline-flex; gap:4px; margin-left:18px; }
+  nav a { color:#26491f; }
+  .lang button { font:inherit; font-size:.85rem; font-weight:600; border:1px solid #26491f; border-radius:999px; padding:3px 10px; cursor:pointer; background:transparent; color:#26491f; }
+  .lang button[aria-pressed="true"] { background:var(--tape); color:var(--ink); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <a class="logo" href="#home" data-go="home" aria-label="DRimbunan"><img class="logo-img" alt="" hidden><span class="logo-text">DRimbunan</span></a>
+    <nav>
+      <a href="#tailoring" data-go="tailoring" data-ms="Jahitan" data-en="Tailoring">Jahitan</a>
+      <a href="#food" data-go="food" data-ms="Makanan" data-en="Food">Makanan</a>
+      <a href="#about" data-go="about" data-ms="Tentang Kami" data-en="About Us">Tentang Kami</a>
+      <a href="#contact" data-go="contact" data-ms="Hubungi Kami" data-en="Contact Us">Hubungi Kami</a>
+      <span class="lang"><button type="button" data-lang="ms" aria-pressed="true">BM</button><button type="button" data-lang="en" aria-pressed="false">EN</button></span>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+
+    <!-- HOME: only two boxes -->
+    <div id="home-view" class="home">
+      <h1 data-ms="Anda cari apa?" data-en="What are you looking for?">Anda cari apa?</h1>
+      <p class="lead" data-ms="Pilih satu untuk lihat produk kami." data-en="Choose one to see our products.">Pilih satu untuk lihat produk kami.</p>
+      <div class="boxes">
+        <button class="box tailor" data-go="tailoring">
+          <h2 data-ms="Jahitan" data-en="Tailoring">Jahitan</h2><span data-ms="Pakaian ditempah khas untuk anda" data-en="Clothes made just for you">Pakaian ditempah khas untuk anda</span>
+        </button>
+        <button class="box food" data-go="food">
+          <h2 data-ms="Makanan" data-en="Food">Makanan</h2><span data-ms="Dibuat segar setiap hari" data-en="Freshly made daily">Dibuat segar setiap hari</span>
+        </button>
+      </div>
+
+      <section class="carousel" aria-roledescription="carousel" aria-label="Gambar kedai">
+        <div class="viewport">
+          <div class="track">
+          <figure class="slide"><div class="ph ph1" data-ms="Tambah gambar 1" data-en="Add photo 1">Tambah gambar 1</div></figure>
+          <figure class="slide"><div class="ph ph2" data-ms="Tambah gambar 2" data-en="Add photo 2">Tambah gambar 2</div></figure>
+          <figure class="slide"><div class="ph ph3" data-ms="Tambah gambar 3" data-en="Add photo 3">Tambah gambar 3</div></figure>
+          <figure class="slide"><div class="ph ph4" data-ms="Tambah gambar 4" data-en="Add photo 4">Tambah gambar 4</div></figure>
+          </div>
+          <button type="button" class="c-btn c-prev" aria-label="Gambar sebelum">‹</button>
+          <button type="button" class="c-btn c-next" aria-label="Gambar seterusnya">›</button>
+        </div>
+        <div class="dots" role="tablist" aria-label="Pilih gambar"></div>
+      </section>
+
+      <section class="about" id="tentang">
+        <h2 data-ms="Tentang Kami" data-en="About Us">Tentang Kami</h2>
+        <p data-ms="DRimbunan merupakan sebuah kedai yang terletak di Tendong, Pasir Mas, Kelantan, menawarkan perkhidmatan jahitan dan makanan di bawah satu bumbung.&#10;&#10;Bagi perkhidmatan jahitan, kami menyediakan tempahan baju kurung mengikut ukuran pelanggan serta perkhidmatan alterasi pakaian.&#10;&#10;Selain itu, kami turut menyediakan pelbagai pilihan makanan dan minuman seperti waffle, pulut, kerabu Maggi dan aneka minuman.&#10;&#10;Sama ada untuk mendapatkan pakaian yang ditempah khas atau menikmati hidangan yang lazat, DRimbunan sedia memenuhi keperluan anda.&#10;&#10;Kunjungi kedai kami di Tendong, Pasir Mas atau hubungi kami melalui WhatsApp untuk sebarang pertanyaan dan tempahan." data-en="DRimbunan is a shop located in Tendong, Pasir Mas, Kelantan, offering tailoring and food services under one roof.&#10;&#10;For tailoring services, we provide made-to-measure baju kurung and clothing alteration services.&#10;&#10;We also offer a variety of food and drinks, including waffles, pulut, kerabu Maggi and assorted beverages.&#10;&#10;Whether you are looking for custom-made clothing or a delicious meal, DRimbunan is ready to meet your needs.&#10;&#10;Visit our shop in Tendong, Pasir Mas or contact us via WhatsApp for enquiries and orders.">DRimbunan merupakan sebuah kedai yang terletak di Tendong, Pasir Mas, Kelantan, menawarkan perkhidmatan jahitan dan makanan di bawah satu bumbung.<br><br>Bagi perkhidmatan jahitan, kami menyediakan tempahan baju kurung mengikut ukuran pelanggan serta perkhidmatan alterasi pakaian.<br><br>Selain itu, kami turut menyediakan pelbagai pilihan makanan dan minuman seperti waffle, pulut, kerabu Maggi dan aneka minuman.<br><br>Sama ada untuk mendapatkan pakaian yang ditempah khas atau menikmati hidangan yang lazat, DRimbunan sedia memenuhi keperluan anda.<br><br>Kunjungi kedai kami di Tendong, Pasir Mas atau hubungi kami melalui WhatsApp untuk sebarang pertanyaan dan tempahan.</p>
+      </section>
+
+    </div>
+
+    <!-- TAILORING PRODUCTS -->
+    <div id="tailoring-view" class="view" hidden>
+      <button class="back" data-go="home" data-ms="← Kembali" data-en="← Back">← Kembali</button>
+      <h2 data-ms="Jahitan" data-en="Tailoring">Jahitan</h2>
+      <p class="lead" data-ms="Bawa kain sendiri atau pilih kain kami. Kami ukur, potong dan jahit mengikut saiz anda." data-en="Bring your own fabric or choose ours. We measure, cut and sew to your size.">Bawa kain sendiri atau pilih kain kami. Kami ukur, potong dan jahit mengikut saiz anda.</p>
+      <div class="items">
+        <article class="item"><div class="photo" data-img="jahitan/baju-kurung" data-ms="Tambah gambar" data-en="Add photo">Tambah gambar</div>
+          <div class="body"><h3>Baju Kurung</h3><p data-ms="Ditempah ikut ukuran, siap dalam 7 hari." data-en="Made to measure, ready in 7 days.">Ditempah ikut ukuran, siap dalam 7 hari.</p><span class="price" data-ms="Dari RM 120" data-en="From RM 120">Dari RM 120</span></div></article>
+        <article class="item"><div class="photo" data-img="jahitan/alterasi" data-ms="Tambah gambar" data-en="Add photo">Tambah gambar</div>
+          <div class="body"><h3 data-ms="Alterasi" data-en="Alteration">Alterasi</h3><p data-ms="Pendekkan, ubah saiz dan baiki zip." data-en="Hemming, resizing and zip repairs.">Pendekkan, ubah saiz dan baiki zip.</p><span class="price" data-ms="Dari RM 3" data-en="From RM 3">Dari RM 3</span></div></article>
+      </div>
+    </div>
+
+    <!-- FOOD PRODUCTS -->
+    <div id="food-view" class="view" hidden>
+      <button class="back" data-go="home" data-ms="← Kembali" data-en="← Back">← Kembali</button>
+      <h2 data-ms="Makanan" data-en="Food">Makanan</h2>
+      <p class="lead" data-ms="Dibuat segar setiap pagi. Tempah awal untuk majlis dan kumpulan besar." data-en="Made fresh every morning. Order ahead for events and large groups.">Dibuat segar setiap pagi. Tempah awal untuk majlis dan kumpulan besar.</p>
+      <div class="items">
+        <button class="item cat" data-menu="waffle" aria-expanded="false"><div class="photo" data-img="makanan/waffle" data-ms="Tambah gambar" data-en="Add photo">Tambah gambar</div>
+          <div class="body"><h3>Waffle</h3><p data-ms="4 pilihan" data-en="4 choices">4 pilihan</p><span class="price" data-ms="Lihat menu" data-en="View menu">Lihat menu</span></div></button>
+        <button class="item cat" data-menu="pulut" aria-expanded="false"><div class="photo" data-img="makanan/pulut" data-ms="Tambah gambar" data-en="Add photo">Tambah gambar</div>
+          <div class="body"><h3 data-ms="Pulut" data-en="Pulut (Sticky Rice)">Pulut</h3><p data-ms="4 pilihan" data-en="4 choices">4 pilihan</p><span class="price" data-ms="Lihat menu" data-en="View menu">Lihat menu</span></div></button>
+        <button class="item cat" data-menu="kerabu" aria-expanded="false"><div class="photo" data-img="makanan/kerabu" data-ms="Tambah gambar" data-en="Add photo">Tambah gambar</div>
+          <div class="body"><h3>Kerabu Maggi</h3><p data-ms="4 pilihan" data-en="4 choices">4 pilihan</p><span class="price" data-ms="Lihat menu" data-en="View menu">Lihat menu</span></div></button>
+        <button class="item cat" data-menu="minuman" aria-expanded="false"><div class="photo" data-img="makanan/minuman" data-ms="Tambah gambar" data-en="Add photo">Tambah gambar</div>
+          <div class="body"><h3 data-ms="Minuman" data-en="Drinks">Minuman</h3><p data-ms="10 pilihan" data-en="10 choices">10 pilihan</p><span class="price" data-ms="Lihat menu" data-en="View menu">Lihat menu</span></div></button>
+      </div>
+      <div id="menu-panel">
+        <section class="menu-block" id="m-waffle" hidden>
+          <h3>Waffle</h3>
+          <ul class="menu">
+          <li><span data-ms="Coklat" data-en="Chocolate">Coklat</span><span class="price">RM 4.00</span></li>
+          <li><span data-ms="Kacang" data-en="Peanut">Kacang</span><span class="price">RM 4.00</span></li>
+          <li><span data-ms="Mentega" data-en="Butter">Mentega</span><span class="price">RM 4.00</span></li>
+          <li><span data-ms="Strawberi" data-en="Strawberry">Strawberi</span><span class="price">RM 4.00</span></li>
+          </ul>
+        </section>
+        <section class="menu-block" id="m-pulut" hidden>
+          <h3 data-ms="Pulut" data-en="Pulut (Sticky Rice)">Pulut</h3>
+          <ul class="menu">
+          <li><span data-ms="Pulut Mangga" data-en="Mango Pulut">Pulut Mangga</span><span class="price">RM 8.00</span></li>
+          <li><span data-ms="Pulut Mangga Kacang Hijau" data-en="Mango Pulut with Mung Beans">Pulut Mangga Kacang Hijau</span><span class="price">RM 9.00</span></li>
+          <li><span data-ms="Pulut Mangga Ais Krim" data-en="Mango Pulut with Ice Cream">Pulut Mangga Ais Krim</span><span class="price">RM 12.00</span></li>
+          <li><span data-ms="Pulut Durian" data-en="Durian Pulut">Pulut Durian</span><span class="price">RM 15.00+</span></li>
+          </ul>
+        </section>
+        <section class="menu-block" id="m-kerabu" hidden>
+          <h3>Kerabu Maggi</h3>
+          <ul class="menu">
+          <li><span data-ms="Biasa" data-en="Regular">Biasa</span><span class="price">RM 4.00</span></li>
+          <li><span data-ms="Ayam" data-en="Chicken">Ayam</span><span class="price">RM 7.50</span></li>
+          <li><span>Seafood</span><span class="price">RM 8.00</span></li>
+          <li><span>Special</span><span class="price">RM 9.50</span></li>
+          </ul>
+        </section>
+        <section class="menu-block" id="m-minuman" hidden>
+          <h3 data-ms="Minuman" data-en="Drinks">Minuman</h3>
+          <ul class="menu">
+          <li><span data-ms="Teh" data-en="Milk Tea">Teh</span><span class="price">RM 3.00</span></li>
+          <li><span data-ms="Teh O" data-en="Plain Tea">Teh O</span><span class="price">RM 3.00</span></li>
+          <li><span data-ms="Sirap" data-en="Rose Syrup">Sirap</span><span class="price">RM 3.00</span></li>
+          <li><span data-ms="Cincau" data-en="Grass Jelly">Cincau</span><span class="price">RM 3.00</span></li>
+          <li><span>Longan</span><span class="price">RM 3.00</span></li>
+          <li><span data-ms="Laici" data-en="Lychee">Laici</span><span class="price">RM 3.00</span></li>
+          <li><span data-ms="Soya Cincau" data-en="Soya with Grass Jelly">Soya Cincau</span><span class="price">RM 3.00</span></li>
+          <li><span>ABC</span><span class="price">RM 3.00</span></li>
+          <li><span>ABC Special</span><span class="price">RM 5.00</span></li>
+          <li><span data-ms="Jus Limau Madu" data-en="Honey Lime Juice">Jus Limau Madu</span><span class="price">RM 5.00</span></li>
+          </ul>
+        </section>
+      </div>
+    </div>
+
+
+
+
+
+
+
+    <!-- CONTACT PAGE -->
+    <div id="contact-view" class="view" hidden>
+      <button class="back" data-go="home" data-ms="← Kembali" data-en="← Back">← Kembali</button>
+      <h2 data-ms="Hubungi Kami" data-en="Contact Us">Hubungi Kami</h2>
+      <p class="lead" data-ms="Datang ke kedai, telefon, atau hantar mesej melalui WhatsApp." data-en="Visit us, call, or send a message on WhatsApp.">Datang ke kedai, telefon, atau hantar mesej melalui WhatsApp.</p>
+
+      <div class="contact-grid">
+        <dl class="details">
+          <dt data-ms="Alamat" data-en="Address">Alamat</dt><dd>314A, Kg Chabang Empat, Tendong, 17030 Bandar Pasir Mas, Kelantan</dd>
+          <dt data-ms="Waktu operasi" data-en="Opening hours">Waktu operasi</dt><dd data-ms="Ahad – Khamis, 11:30 pagi – 10:00 malam<br>Jumaat dan Sabtu: tutup" data-en="Sunday – Thursday, 11:30 am – 10:00 pm<br>Friday and Saturday: closed">Ahad – Khamis, 11:30 pagi – 10:00 malam<br>Jumaat dan Sabtu: tutup</dd>
+          <dt data-ms="Telefon" data-en="Phone">Telefon</dt><dd><a href="tel:+60173617907">+60 17-361 7907</a></dd>
+          <dt>WhatsApp</dt><dd><a href="https://wa.me/60173617907">+60 17-361 7907</a></dd>
+          <dt data-ms="E-mel" data-en="Email">E-mel</dt><dd><a href="mailto:drimbunanniaga@gmail.com">drimbunanniaga@gmail.com</a></dd>
+          <dt>Instagram</dt><dd><a href="https://www.instagram.com/drimbunanniaga/" target="_blank" rel="noopener">@drimbunanniaga</a></dd>
+        </dl>
+
+        <form id="msg-form">
+          <label for="f-name" data-ms="Nama anda" data-en="Your name">Nama anda</label>
+          <input id="f-name" required>
+          <label for="f-topic" data-ms="Mengenai" data-en="About">Mengenai</label>
+          <select id="f-topic">
+            <option data-ms="Jahitan" data-en="Tailoring">Jahitan</option>
+            <option data-ms="Makanan" data-en="Food">Makanan</option>
+            <option data-ms="Lain-lain" data-en="Other">Lain-lain</option>
+          </select>
+          <label for="f-msg" data-ms="Mesej" data-en="Message">Mesej</label>
+          <textarea id="f-msg" rows="4" required></textarea>
+          <button type="submit" class="send" data-ms="Hantar melalui WhatsApp" data-en="Send on WhatsApp">Hantar melalui WhatsApp</button>
+        </form>
+      </div>
+
+      <div class="map">
+        <iframe title="Shop location" loading="lazy"
+          src="https://maps.google.com/maps?q=6.0681678,102.2062349&z=17&output=embed"></iframe>
+      </div>
+      <p class="map-link"><a href="https://maps.app.goo.gl/vANk4TwT3LhvwJk97" target="_blank" rel="noopener" data-ms="Buka di Google Maps" data-en="Open in Google Maps">Buka di Google Maps</a></p>
+    </div>
+  </div>
+</main>
+
+<footer>© DRimbunan</footer>
+
+<script>
+  var views = ["home", "tailoring", "food", "contact"];
+
+  function show(name) {
+    var toAbout = (name === "about");
+    if (toAbout) { name = "home"; }
+    if (views.indexOf(name) === -1) { return; }
+    views.forEach(function (v) {
+      document.getElementById(v + "-view").hidden = (v !== name);
+    });
+    if (toAbout) { document.getElementById("tentang").scrollIntoView(); }
+    else { window.scrollTo(0, 0); }
+  }
+
+  // Buttons: go to a view (changes the URL so the phone's Back button works)
+  document.addEventListener("click", function (e) {
+    var btn = e.target.closest("[data-go]");
+    if (btn) {
+      e.preventDefault();
+      var name = btn.getAttribute("data-go");
+      show(name);
+      if (location.hash !== "#" + name) { history.pushState(null, "", "#" + name); }
+    }
+  });
+  window.addEventListener("popstate", route);
+
+  function route() {
+    var name = location.hash.replace("#", "");
+    show(name || "home");
+  }
+  window.addEventListener("hashchange", route);
+  route();
+
+  // Keep the Kembali button just under the header, whatever its height
+  function headerHeight() {
+    document.documentElement.style.setProperty("--hdr", document.querySelector("header").offsetHeight + "px");
+  }
+  headerHeight();
+  window.addEventListener("load", headerHeight);
+  window.addEventListener("resize", headerHeight);
+
+  // Food lists open right under the row of the card you tapped
+  function columns() { return window.innerWidth > 900 ? 4 : (window.innerWidth > 600 ? 2 : 1); }
+  function place(block, card) {
+    var cats = Array.prototype.slice.call(document.querySelectorAll(".cat"));
+    var c = columns(), i = cats.indexOf(card);
+    var last = Math.min(cats.length, (Math.floor(i / c) + 1) * c) - 1;
+    cats[last].insertAdjacentElement("afterend", block);
+  }
+  window.addEventListener("resize", function () {
+    var card = document.querySelector(".cat.active");
+    if (card) { place(document.getElementById("m-" + card.getAttribute("data-menu")), card); }
+  });
+
+  // Food types: show the list on the same page
+  document.addEventListener("click", function (e) {
+    var card = e.target.closest("[data-menu]");
+    if (!card) { return; }
+    var key = card.getAttribute("data-menu");
+    var block = document.getElementById("m-" + key);
+    var open = block.hidden;
+    document.querySelectorAll(".menu-block").forEach(function (b) { b.hidden = true; });
+    document.querySelectorAll(".cat").forEach(function (c) {
+      c.classList.remove("active"); c.setAttribute("aria-expanded", "false");
+    });
+    if (open) {
+      place(block, card);
+      block.hidden = false;
+      card.classList.add("active");
+      card.setAttribute("aria-expanded", "true");
+      block.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+  });
+
+  // Contact form: opens WhatsApp with the message filled in
+  document.getElementById("msg-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var text = (document.documentElement.lang === "en" ? "Hi, I'm " : "Hai, saya ") + document.getElementById("f-name").value +
+      (document.documentElement.lang === "en" ? ". About: " : ". Mengenai: ") + document.getElementById("f-topic").value + ". " +
+      document.getElementById("f-msg").value;
+    window.open("https://wa.me/60173617907?text=" + encodeURIComponent(text), "_blank");
+  });
+</script>
+<script>
+// Pictures: put files in myshop/images/ and they load automatically
+//   images/logo.png                             (logo in the header)
+//   images/main menu/1.jpg, 2.jpg, 3.jpg ...   (carousel on the home page)
+//   images/jahitan/baju-kurung.jpg, alterasi.jpg
+//   images/makanan/waffle.jpg, pulut.jpg, kerabu.jpg, minuman.jpg
+// Lowercase names. jpg, jpeg, png or webp all work.
+(function () {
+  var EXT = ["jpg", "jpeg", "png", "webp"];
+
+  function tryLoad(base, done, exts) {
+    var list = exts || EXT, i = 0;
+    (function next() {
+      if (i >= list.length) { done(null); return; }
+      var url = encodeURI(base + "." + list[i++]);
+      var im = new Image();
+      im.onload = function () { done(url); };
+      im.onerror = next;
+      im.src = url;
+    })();
+  }
+
+  // Logo: images/logo.png (svg, jpg, jpeg or webp also work)
+  tryLoad("images/logo", function (url) {
+    if (!url) { return; }
+    var img = document.querySelector(".logo-img");
+    img.src = url;
+    img.hidden = false;
+    document.querySelector(".logo-text").hidden = true;
+    window.dispatchEvent(new Event("resize"));
+  }, ["png", "svg", "jpg", "jpeg", "webp"]);
+
+  // Product cards (Jahitan and Makanan)
+  document.querySelectorAll("[data-img]").forEach(function (box) {
+    tryLoad("images/" + box.getAttribute("data-img"), function (url) {
+      if (!url) { return; }
+      var title = box.parentNode.querySelector("h3");
+      var im = new Image();
+      im.src = url;
+      im.alt = title ? title.textContent : "";
+      box.innerHTML = "";
+      box.appendChild(im);
+    });
+  });
+
+  // Carousel
+  var box = document.querySelector(".carousel");
+  var track = box.querySelector(".track");
+  var dotsBox = box.querySelector(".dots");
+  var prev = box.querySelector(".c-prev"), next = box.querySelector(".c-next");
+  var slides = [], idx = 0, timer = null, startX = null;
+
+  function setup() {
+    slides = track.querySelectorAll(".slide");
+    dotsBox.innerHTML = "";
+    slides.forEach(function (_, i) {
+      var d = document.createElement("button");
+      d.type = "button";
+      d.setAttribute("role", "tab");
+      d.setAttribute("aria-label", "Gambar " + (i + 1));
+      d.addEventListener("click", function () { go(i); restart(); });
+      dotsBox.appendChild(d);
+    });
+    var many = slides.length > 1;
+    prev.hidden = !many; next.hidden = !many; dotsBox.hidden = !many;
+    go(0);
+    restart();
+  }
+  function go(n) {
+    idx = (n + slides.length) % slides.length;
+    track.style.transform = "translateX(-" + (idx * 100) + "%)";
+    dotsBox.querySelectorAll("button").forEach(function (d, i) {
+      d.setAttribute("aria-selected", i === idx ? "true" : "false");
+    });
+  }
+  function restart() {
+    clearInterval(timer);
+    if (slides.length < 2 || window.matchMedia("(prefers-reduced-motion: reduce)").matches) { return; }
+    timer = setInterval(function () { go(idx + 1); }, 5000);
+  }
+
+  prev.addEventListener("click", function () { go(idx - 1); restart(); });
+  next.addEventListener("click", function () { go(idx + 1); restart(); });
+  box.addEventListener("mouseenter", function () { clearInterval(timer); });
+  box.addEventListener("mouseleave", restart);
+  box.addEventListener("touchstart", function (e) { startX = e.touches[0].clientX; }, { passive: true });
+  box.addEventListener("touchend", function (e) {
+    if (startX === null) { return; }
+    var dx = e.changedTouches[0].clientX - startX;
+    if (Math.abs(dx) > 40) { go(idx + (dx < 0 ? 1 : -1)); restart(); }
+    startX = null;
+  });
+
+  setup();   // placeholders first
+
+  // Look for images/main menu/1 ... 10 and use the ones that exist
+  var found = [], pending = 10;
+  for (var n = 1; n <= 10; n++) {
+    (function (n) {
+      tryLoad("images/main menu/" + n, function (url) {
+        if (url) { found[n] = url; }
+        pending -= 1;
+        if (pending === 0) {
+          var urls = found.filter(Boolean);
+          if (!urls.length) { return; }
+          track.innerHTML = urls.map(function (u, i) {
+            return '<figure class="slide"><img src="' + u + '" alt="Gambar kedai DRimbunan ' + (i + 1) + '"></figure>';
+          }).join("");
+          setup();
+        }
+      });
+    })(n);
+  }
+})();
+</script>
+<script>
+// Language: Malay (default) or English. Each translated element holds both texts in data-ms / data-en.
+(function () {
+  var TITLES = { ms: "DRimbunan – Jahitan dan Makanan", en: "DRimbunan – Tailoring and Food" };
+
+  function apply(lang) {
+    document.documentElement.lang = lang;
+    document.querySelectorAll("[data-ms]").forEach(function (el) {
+      if (el.querySelector("img")) { return; }          // keep real photos
+      var t = el.getAttribute("data-" + lang);
+      if (t !== null) { el.innerHTML = t; }
+    });
+    document.querySelectorAll(".photo img").forEach(function (img) {
+      var h = img.parentNode.parentNode.querySelector("h3");
+      if (h) { img.alt = h.textContent; }
+    });
+    document.querySelectorAll("[data-lang]").forEach(function (b) {
+      b.setAttribute("aria-pressed", b.getAttribute("data-lang") === lang ? "true" : "false");
+    });
+    document.title = TITLES[lang];
+    window.dispatchEvent(new Event("resize"));
+  }
+
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest("[data-lang]");
+    if (!b) { return; }
+    var lang = b.getAttribute("data-lang");
+    try { localStorage.setItem("drimbunan-lang", lang); } catch (err) {}
+    apply(lang);
+  });
+
+  var saved = null;
+  try { saved = localStorage.getItem("drimbunan-lang"); } catch (err) {}
+  if (saved === "en") { apply("en"); }
+})();
+</script>
+</body>
+</html>
