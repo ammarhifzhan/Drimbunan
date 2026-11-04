@@ -43,6 +43,19 @@
   #food-view h2 { border-left-color:var(--chili); }
   .view .lead { color:var(--muted); margin:8px 0 28px; max-width:54ch; }
   .items { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:20px; }
+  .tailoring-category { margin-top:28px; }
+  .tailoring-category > h3 { margin-bottom:12px; font-size:1.35rem; color:var(--ink); }
+  .tailoring-category .items { margin-top:0; }
+  .pot-holder-carousel { position:relative; overflow:hidden; aspect-ratio:4/3; background:var(--photo); }
+  .pot-holder-track { display:flex; height:100%; transition:transform .35s ease; }
+  .pot-holder-slide { flex:0 0 100%; min-width:0; position:relative; display:grid; place-items:center; }
+  .pot-holder-slide img { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; background:#000; display:block; }
+  .pot-holder-carousel button { position:absolute; top:50%; transform:translateY(-50%); border:0; border-radius:50%; width:30px; height:30px; cursor:pointer; background:rgba(255,255,255,.9); color:var(--ink); }
+  .pot-holder-carousel .pot-prev { left:10px; }
+  .pot-holder-carousel .pot-next { right:10px; }
+  .pot-holder-dots { position:absolute; bottom:10px; left:0; right:0; display:flex; justify-content:center; gap:5px; }
+  .pot-holder-dots button { position:static; transform:none; width:8px; height:8px; padding:0; background:rgba(255,255,255,.65); }
+  .pot-holder-dots button[aria-selected="true"] { background:var(--ink); }
   .item { background:var(--surface); border:1px solid var(--line); border-radius:6px; overflow:hidden; }
   #food-view .items { grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); }
   .cat { display:block; width:100%; text-align:left; font:inherit; color:inherit; cursor:pointer; padding:0; transition:transform .2s ease, box-shadow .2s ease, background .2s ease, color .2s ease, border-color .2s ease; }
@@ -138,6 +151,20 @@
   nav a { color:#26491f; }
   .lang button { font:inherit; font-size:.85rem; font-weight:600; border:1px solid #26491f; border-radius:999px; padding:3px 10px; cursor:pointer; background:transparent; color:#26491f; }
   .lang button[aria-pressed="true"] { background:var(--tape); color:var(--ink); }
+  /* Fullscreen picture viewer */
+  .photo { position:relative; }
+  .fs-btn { position:absolute; top:10px; right:10px; z-index:5; width:36px; height:36px; display:grid; place-items:center; border:0; border-radius:8px; cursor:pointer; background:rgba(0,0,0,.55); color:#fff; }
+  .fs-btn:hover { background:rgba(0,0,0,.8); }
+  .viewport:not(:has(img)) .fs-btn, .pot-holder-carousel:not(:has(img)) .fs-btn { display:none; }
+  body.viewing { overflow:hidden; }
+  #viewer { position:fixed; inset:0; z-index:100; background:#000; display:flex; align-items:center; justify-content:center; }
+  .v-img { max-width:100%; max-height:100%; width:auto; height:auto; object-fit:contain; display:block; }
+  .v-btn { position:absolute; width:46px; height:46px; border:0; border-radius:50%; font-size:1.6rem; line-height:1; cursor:pointer; background:rgba(255,255,255,.2); color:#fff; }
+  .v-btn:hover { background:rgba(255,255,255,.35); }
+  .v-close { top:calc(12px + env(safe-area-inset-top, 0px)); right:12px; }
+  .v-prev { left:12px; top:50%; transform:translateY(-50%); }
+  .v-next { right:12px; top:50%; transform:translateY(-50%); }
+  .v-count { position:absolute; bottom:calc(14px + env(safe-area-inset-bottom, 0px)); left:0; right:0; text-align:center; color:#fff; font-size:.95rem; text-shadow:0 0 6px #000; }
 </style>
 </head>
 <body>
@@ -180,7 +207,7 @@
           <figure class="slide"><div class="ph ph4" data-ms="Tambah gambar 4" data-en="Add photo 4">Tambah gambar 4</div></figure>
           </div>
           <button type="button" class="c-btn c-prev" aria-label="Gambar sebelum">‹</button>
-          <button type="button" class="c-btn c-next" aria-label="Gambar seterusnya">›</button>
+          <button type="button" class="c-btn c-next" aria-label="Gambar seterusnya">›</button><button type="button" class="fs-btn" aria-label="Skrin penuh / Fullscreen"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         </div>
         <div class="dots" role="tablist" aria-label="Pilih gambar"></div>
       </section>
@@ -197,12 +224,32 @@
       <button class="back" data-go="home" data-ms="← Kembali" data-en="← Back">← Kembali</button>
       <h2 data-ms="Jahitan" data-en="Tailoring">Jahitan</h2>
       <p class="lead" data-ms="Bawa kain sendiri atau pilih kain kami. Kami ukur, potong dan jahit mengikut saiz anda." data-en="Bring your own fabric or choose ours. We measure, cut and sew to your size.">Bawa kain sendiri atau pilih kain kami. Kami ukur, potong dan jahit mengikut saiz anda.</p>
-      <div class="items">
-        <article class="item"><div class="photo" data-img="jahitan/baju-kurung" data-ms="Tambah gambar" data-en="Add photo">Tambah gambar</div>
-          <div class="body"><h3>Baju Kurung</h3><p data-ms="Ditempah ikut ukuran, siap dalam 7 hari." data-en="Made to measure, ready in 7 days.">Ditempah ikut ukuran, siap dalam 7 hari.</p><span class="price" data-ms="Dari RM 120" data-en="From RM 120">Dari RM 120</span></div></article>
-        <article class="item"><div class="photo" data-img="jahitan/alterasi" data-ms="Tambah gambar" data-en="Add photo">Tambah gambar</div>
-          <div class="body"><h3 data-ms="Alterasi" data-en="Alteration">Alterasi</h3><p data-ms="Pendekkan, ubah saiz dan baiki zip." data-en="Hemming, resizing and zip repairs.">Pendekkan, ubah saiz dan baiki zip.</p><span class="price" data-ms="Dari RM 3" data-en="From RM 3">Dari RM 3</span></div></article>
-      </div>
+      <section class="tailoring-category">
+        <h3 data-ms="Perkhidmatan Jahitan" data-en="Sewing Services">Perkhidmatan Jahitan</h3>
+        <div class="items">
+          <article class="item"><div class="photo" data-img="jahitan/baju-kurung" data-ms="Tambah gambar" data-en="Add photo">Tambah gambar</div>
+            <div class="body"><h3>Baju Kurung</h3><p data-ms="Ditempah ikut ukuran, siap dalam 1 bulan." data-en="Made to measure, ready in 1 month.">Ditempah ikut ukuran, siap dalam 1 bulan.</p><span class="price" data-ms="Dari RM 50" data-en="From RM 50">Dari RM 50</span></div></article>
+          <article class="item"><div class="photo" data-img="jahitan/alterasi" data-ms="Tambah gambar" data-en="Add photo">Tambah gambar</div>
+            <div class="body"><h3 data-ms="Alterasi" data-en="Alteration">Alterasi</h3><p data-ms="Pendekkan, ubah saiz dan baiki zip." data-en="Hemming, resizing and zip repairs.">Pendekkan, ubah saiz dan baiki zip.</p><span class="price" data-ms="Dari RM 3" data-en="From RM 3">Dari RM 3</span></div></article>
+        </div>
+      </section>
+      <section class="tailoring-category">
+        <h3 data-ms="Produk Jahitan" data-en="Sewing Products">Produk Jahitan</h3>
+        <div class="items">
+          <article class="item"><div class="pot-holder-carousel" data-carousel-prefix="jahitan/pot-holder/" data-start="1" data-end="3" aria-label="Pot holder 1 images">
+            <div class="pot-holder-track"><div class="pot-holder-slide"><span data-ms="Tambah gambar 1" data-en="Add photo 1">Tambah gambar 1</span></div></div>
+            <button class="pot-prev" type="button" aria-label="Previous image" hidden>‹</button><button class="pot-next" type="button" aria-label="Next image" hidden>›</button>
+            <div class="pot-holder-dots" hidden></div><button type="button" class="fs-btn" aria-label="Skrin penuh / Fullscreen"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          </div>
+            <div class="body"><h3 data-ms="Pemegang Periuk 1" data-en="Pot Holder 1">Pemegang Periuk 1</h3><p data-ms="Pemegang periuk yang praktikal untuk dapur anda." data-en="A practical pot holder for your kitchen.">Pemegang periuk yang praktikal untuk dapur anda.</p><span class="price">RM 5</span></div></article>
+          <article class="item"><div class="pot-holder-carousel" data-carousel-prefix="jahitan/pot-holder/" data-start="4" data-end="6" aria-label="Pot holder 2 images">
+            <div class="pot-holder-track"><div class="pot-holder-slide"><span data-ms="Tambah gambar 1" data-en="Add photo 1">Tambah gambar 1</span></div></div>
+            <button class="pot-prev" type="button" aria-label="Previous image" hidden>‹</button><button class="pot-next" type="button" aria-label="Next image" hidden>›</button>
+            <div class="pot-holder-dots" hidden></div><button type="button" class="fs-btn" aria-label="Skrin penuh / Fullscreen"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          </div>
+            <div class="body"><h3 data-ms="Pemegang Periuk 2" data-en="Pot Holder 2">Pemegang Periuk 2</h3><p data-ms="Pemegang periuk yang praktikal untuk dapur anda." data-en="A practical pot holder for your kitchen.">Pemegang periuk yang praktikal untuk dapur anda.</p><span class="price">RM 7</span></div></article>
+        </div>
+      </section>
     </div>
 
     <!-- FOOD PRODUCTS -->
@@ -314,6 +361,13 @@
 
 <footer>© DRimbunan</footer>
 
+<div id="viewer" hidden role="dialog" aria-modal="true" aria-label="Gambar / Picture">
+  <button type="button" class="v-btn v-close" aria-label="Tutup / Close">✕</button>
+  <button type="button" class="v-btn v-prev" aria-label="Sebelum / Previous">‹</button>
+  <img class="v-img" alt="">
+  <button type="button" class="v-btn v-next" aria-label="Seterusnya / Next">›</button>
+  <div class="v-count" aria-live="polite"></div>
+</div>
 <script>
   var views = ["home", "tailoring", "food", "contact"];
 
@@ -328,22 +382,103 @@
     else { window.scrollTo(0, 0); }
   }
 
-  // Buttons: go to a view (changes the URL so the phone's Back button works)
+  // ---- Fullscreen picture viewer ----
+  var viewer = document.getElementById("viewer");
+  var vImg = viewer.querySelector(".v-img"), vCount = viewer.querySelector(".v-count");
+  var vPrev = viewer.querySelector(".v-prev"), vNext = viewer.querySelector(".v-next");
+  var vList = [], vIdx = 0, vStartX = null;
+
+  function viewerOpen() { return !viewer.hidden; }
+  function vShow(i) {
+    vIdx = (i + vList.length) % vList.length;
+    vImg.src = vList[vIdx].src;
+    vImg.alt = vList[vIdx].alt || "";
+    vCount.textContent = vList.length > 1 ? (vIdx + 1) + " / " + vList.length : "";
+  }
+  function openViewer(list, i) {
+    if (!list.length) { return; }
+    vList = list;
+    vShow(i);
+    var many = list.length > 1;
+    vPrev.hidden = !many; vNext.hidden = !many;
+    viewer.hidden = false;
+    document.body.classList.add("viewing");
+    history.pushState({ i: stateIndex() + 1, viewer: true }, "", location.href);
+    try { var r = viewer.requestFullscreen && viewer.requestFullscreen(); if (r && r.catch) { r.catch(function () {}); } } catch (err) {}
+    viewer.querySelector(".v-close").focus();
+  }
+  function hideViewer() {
+    viewer.hidden = true;
+    document.body.classList.remove("viewing");
+    try { if (document.fullscreenElement) { var r = document.exitFullscreen(); if (r && r.catch) { r.catch(function () {}); } } } catch (err) {}
+  }
+  function closeViewer() {
+    if (!viewerOpen()) { return; }
+    if (history.state && history.state.viewer) { history.back(); } else { hideViewer(); }
+  }
+
+  // Only the expand button opens the viewer; tapping the picture itself does nothing
+  document.addEventListener("click", function (e) {
+    var btn = e.target.closest(".fs-btn");
+    if (!btn) { return; }
+    var box = btn.closest(".photo, .carousel, .pot-holder-carousel");
+    if (!box) { return; }
+    e.preventDefault(); e.stopPropagation();
+    var list = [].slice.call(box.querySelectorAll("img"));
+    var track = box.querySelector(".track, .pot-holder-track");
+    var m = track && /-(\d+)%/.exec(track.style.transform || "");
+    openViewer(list, m ? Math.round(Number(m[1]) / 100) : 0);
+  }, true);
+
+  viewer.querySelector(".v-close").addEventListener("click", closeViewer);
+  vPrev.addEventListener("click", function () { vShow(vIdx - 1); });
+  vNext.addEventListener("click", function () { vShow(vIdx + 1); });
+  viewer.addEventListener("click", function (e) { if (e.target === viewer) { closeViewer(); } });
+  viewer.addEventListener("touchstart", function (e) { vStartX = e.touches[0].clientX; }, { passive: true });
+  viewer.addEventListener("touchend", function (e) {
+    if (vStartX === null || vList.length < 2) { vStartX = null; return; }
+    var dx = e.changedTouches[0].clientX - vStartX;
+    if (Math.abs(dx) > 50) { vShow(vIdx + (dx < 0 ? 1 : -1)); }
+    vStartX = null;
+  });
+  document.addEventListener("keydown", function (e) {
+    if (!viewerOpen()) { return; }
+    if (e.key === "Escape") { closeViewer(); }
+    if (e.key === "ArrowLeft" && vList.length > 1) { vShow(vIdx - 1); }
+    if (e.key === "ArrowRight" && vList.length > 1) { vShow(vIdx + 1); }
+  });
+  document.addEventListener("fullscreenchange", function () {
+    if (!document.fullscreenElement && viewerOpen()) { closeViewer(); }
+  });
+
+  // Navigation with browser history, so the Android back gesture / button goes back one page
+  var scrollAt = {};                       // remembers how far each page was scrolled
+  function stateIndex() { return (history.state && typeof history.state.i === "number") ? history.state.i : 0; }
+  if (!history.state) { history.replaceState({ i: 0 }, "", location.href); }
+
   document.addEventListener("click", function (e) {
     var btn = e.target.closest("[data-go]");
-    if (btn) {
-      e.preventDefault();
-      var name = btn.getAttribute("data-go");
-      show(name);
-      if (location.hash !== "#" + name) { history.pushState(null, "", "#" + name); }
+    if (!btn) { return; }
+    e.preventDefault();
+    var name = btn.getAttribute("data-go");
+    if (btn.classList.contains("back")) {            // "Kembali" works like the back button
+      if (stateIndex() > 0) { history.back(); }
+      else { show("home"); history.replaceState({ i: 0 }, "", "#home"); }
+      return;
     }
+    scrollAt[stateIndex()] = window.scrollY;
+    show(name);
+    if (location.hash !== "#" + name) { history.pushState({ i: stateIndex() + 1 }, "", "#" + name); }
   });
-  window.addEventListener("popstate", route);
 
   function route() {
-    var name = location.hash.replace("#", "");
-    show(name || "home");
+    if (viewerOpen() && !(history.state && history.state.viewer)) { hideViewer(); return; }   // back gesture closes the viewer
+    var name = location.hash.replace("#", "") || "home";
+    show(name);
+    var y = scrollAt[stateIndex()];
+    if (y && name !== "about") { window.scrollTo(0, y); }
   }
+  window.addEventListener("popstate", route);
   window.addEventListener("hashchange", route);
   route();
 
@@ -439,7 +574,54 @@
       im.alt = title ? title.textContent : "";
       box.innerHTML = "";
       box.appendChild(im);
+      var fb = document.createElement("button");
+      fb.type = "button"; fb.className = "fs-btn";
+      fb.setAttribute("aria-label", "Skrin penuh / Fullscreen");
+      fb.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      box.appendChild(fb);
     });
+  });
+
+  // Pot holder cards: card 1 uses pictures 1-3, card 2 uses 4-6 (images/jahitan/pot-holder/)
+  document.querySelectorAll("[data-carousel-prefix]").forEach(function (box) {
+    var prefix = box.getAttribute("data-carousel-prefix");
+    var track = box.querySelector(".pot-holder-track");
+    var dots = box.querySelector(".pot-holder-dots");
+    var prev = box.querySelector(".pot-prev"), next = box.querySelector(".pot-next");
+    var first = Number(box.getAttribute("data-start")) || 1;
+    var last = Number(box.getAttribute("data-end")) || 10;
+    var found = [], pending = last - first + 1, index = 0;
+    for (var n = first; n <= last; n++) {
+      (function (n) {
+        tryLoad("images/" + prefix + n, function (url) {
+          if (url) { found[n - first] = url; }
+          pending -= 1;
+          if (pending !== 0) { return; }
+          var urls = found.filter(Boolean);
+          if (!urls.length) { return; }
+          track.innerHTML = urls.map(function (url, i) {
+            return '<div class="pot-holder-slide"><img src="' + url + '" alt="Pot holder image ' + (i + 1) + '"></div>';
+          }).join("");
+          dots.innerHTML = urls.map(function (_, i) {
+            return '<button type="button" aria-label="Pot holder image ' + (i + 1) + '" aria-selected="' + (i === 0 ? "true" : "false") + '"></button>';
+          }).join("");
+          var many = urls.length > 1;
+          prev.hidden = !many; next.hidden = !many; dots.hidden = !many;
+          function go(nextIndex) {
+            index = (nextIndex + urls.length) % urls.length;
+            track.style.transform = "translateX(-" + (index * 100) + "%)";
+            dots.querySelectorAll("button").forEach(function (dot, dotIndex) {
+              dot.setAttribute("aria-selected", dotIndex === index ? "true" : "false");
+            });
+          }
+          prev.addEventListener("click", function () { go(index - 1); });
+          next.addEventListener("click", function () { go(index + 1); });
+          dots.querySelectorAll("button").forEach(function (dot, dotIndex) {
+            dot.addEventListener("click", function () { go(dotIndex); });
+          });
+        });
+      })(n);
+    }
   });
 
   // Carousel
